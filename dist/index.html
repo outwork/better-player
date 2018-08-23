@@ -1,0 +1,86 @@
+<html>
+<head>
+<link href="css/main.css" rel="stylesheet">
+<script src="js/template-web.js"></script>
+</head>
+
+<body style='margin:0'>
+<div id="content"></div>
+<script id="bar.html" type="text/html">
+<div id='bar'>
+    <button>Play/Pause</button>
+    <button>Mute/Unmute</button>
+    <span>[ooo     ]</span>
+    <span>00:00 / 11:11</span>
+</div></script><script id="rightmenu.html" type="text/html"><div id='rightmenu'>
+    
+</div></script><script id="video.html" type="text/html">
+<video
+    poster="https://snap1.d.tube/ipfs/QmQvJ8J4jFVh4krtHWWgB1xZnzCA7Pgzt45gzxz8mGm94r"
+    autoplay=""
+    tabindex="-1"
+    src="https://video.dtube.top/ipfs/QmSxeVrAZCmeKvvnn1cidFPAAAh3rvjAwrEpQ4ZjPZmUYg">
+</video></script>
+<script>
+
+document.getElementById('content').innerHTML = 
+    template('video.html', {})
+    + template('bar.html', {})
+    + template('rightmenu.html', {})
+
+video = document.getElementsByTagName('video')[0]
+bar = document.getElementById('bar')
+rightmenu = document.getElementById('rightmenu')
+
+video.toggle = function() {
+    if (video.paused)
+        video.play()
+    else
+        video.pause()
+}
+video.onclick = () => toggle()
+bar.getElementsByTagName('button')[0].onclick = () => toggle()
+bar.getElementsByTagName('button')[1].onclick = () => mute()
+
+function toggle() {
+    video.toggle()
+}
+
+function mute() {
+    if (video.volume == 0)
+        video.volume = 1
+    else
+        video.volume = 0
+}
+if (document.addEventListener) { // IE >= 9; other browsers
+    document.addEventListener('contextmenu', function(e) {
+        if (toggleRightMenu(e))
+            e.preventDefault();
+    }, false);
+} else { // IE < 9
+    document.attachEvent('oncontextmenu', function() {
+        toggleRightMenu()
+        window.event.returnValue = false;
+    });
+}
+
+function toggleRightMenu(e) {
+    //console.log('right click', rightmenu.style.display, e)
+    // pressing alt key disables this menu for the normal menu
+    if (e && e.altKey == true)
+        return false
+
+    if (rightmenu.style.display == 'block')
+        rightmenu.style.display = 'none'
+    else
+        rightmenu.style.display = 'block'
+
+    rightmenu.style.left = e.clientX
+    rightmenu.style.top = e.clientY
+
+    return true
+}
+
+</script>
+</body>
+</html>

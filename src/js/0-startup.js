@@ -1,4 +1,3 @@
-
 document.getElementById('content').innerHTML = 
     template('video.html', {})
     + template('bar.html', {})

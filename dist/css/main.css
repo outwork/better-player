@@ -10,11 +10,35 @@ video {
     height: 36px;
     width: 100%;
     z-index: 60;
-    padding-top: 3px;
     text-align: left;
     direction: ltr;
     position: absolute;
     text-shadow: 0 0 2px rgba(0,0,0,.5);
+}
+
+#bar>canvas {
+    height:100%;
+    background-color: rgba(0,255,0,0.5);
+    vertical-align: top;
+}
+
+#bar>button {
+    height: 100%;
+    vertical-align: top;
+}
+
+#bar>span {
+    height: 100%;
+    vertical-align: top;
+}
+
+#bar>#float {
+    float: right;
+}
+
+#bar>#float>button {
+    height: 100%;
+    vertical-align: top;
 }
 
 #rightmenu {
@@ -26,4 +50,24 @@ video {
     left: 367px;
     top: 281px;
     display: none;
+}
+
+/* Chrome, Safari and Opera syntax */
+:-webkit-full-screen {
+    background-color: yellow;
+}
+
+/* Firefox syntax */
+:-moz-full-screen {
+    background-color: yellow;
+}
+
+/* IE/Edge syntax */
+:-ms-fullscreen {
+    background-color: yellow;
+}
+
+/* Standard syntax */
+:fullscreen {
+    background-color: yellow;
 }

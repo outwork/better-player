@@ -10,19 +10,24 @@
 <div id='bar'>
     <button>Play/Pause</button>
     <button>Mute/Unmute</button>
-    <span>[ooo     ]</span>
+    <canvas></canvas>
     <span>00:00 / 11:11</span>
+    <div id='float'>
+        <button>Settings</button>
+        <button>DTube</button>
+        <button>Full Screen</button>
+    </div>
 </div></script><script id="rightmenu.html" type="text/html"><div id='rightmenu'>
     
 </div></script><script id="video.html" type="text/html">
 <video
+    id="video"
     poster="https://snap1.d.tube/ipfs/QmQvJ8J4jFVh4krtHWWgB1xZnzCA7Pgzt45gzxz8mGm94r"
     autoplay=""
     tabindex="-1"
     src="https://video.dtube.top/ipfs/QmSxeVrAZCmeKvvnn1cidFPAAAh3rvjAwrEpQ4ZjPZmUYg">
 </video></script>
 <script>
-
 document.getElementById('content').innerHTML = 
     template('video.html', {})
     + template('bar.html', {})
@@ -38,37 +43,64 @@ video.toggle = function() {
     else
         video.pause()
 }
-video.onclick = () => toggle()
-bar.getElementsByTagName('button')[0].onclick = () => toggle()
-bar.getElementsByTagName('button')[1].onclick = () => mute()
 
-function toggle() {
-    video.toggle()
-}
-
-function mute() {
+video.mute = function() {
     if (video.volume == 0)
         video.volume = 1
     else
         video.volume = 0
 }
-if (document.addEventListener) { // IE >= 9; other browsers
-    document.addEventListener('contextmenu', function(e) {
-        if (toggleRightMenu(e))
-            e.preventDefault();
-    }, false);
-} else { // IE < 9
-    document.attachEvent('oncontextmenu', function() {
-        toggleRightMenu()
-        window.event.returnValue = false;
-    });
+
+video.toggleFullscreen = function(event) {
+    var isFullscreen = document.webkitIsFullScreen || document.mozFullScreen || false;
+    if (isFullscreen)
+        video.closeFullscreen()
+    else
+        video.openFullScreen()
 }
 
-function toggleRightMenu(e) {
+video.openFullScreen = function() {
+    var html = document.documentElement
+    if (html.requestFullscreen) {
+        html.requestFullscreen();
+      } else if (html.mozRequestFullScreen) {
+        html.mozRequestFullScreen();
+      } else if (html.webkitRequestFullscreen) {
+        html.webkitRequestFullscreen();
+      } else if (html.msRequestFullscreen) { 
+        html.msRequestFullscreen();
+      }
+}
+
+video.closeFullscreen = function() {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.mozCancelFullScreen) { /* Firefox */
+      document.mozCancelFullScreen();
+    } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) { /* IE/Edge */
+      document.msExitFullscreen();
+    }
+  }
+// window
+window.oncontextmenu = (e) => rightmenu.toggle(e)
+
+// video
+video.onclick = () => video.toggle()
+
+// bar
+bar.getElementsByTagName('button')[0].onclick = () => video.toggle()
+bar.getElementsByTagName('button')[1].onclick = () => video.mute()
+bar.getElementsByTagName('button')[4].onclick = () => video.toggleFullscreen()
+
+// rightmenu
+
+rightmenu.toggle = function(e) {
     //console.log('right click', rightmenu.style.display, e)
     // pressing alt key disables this menu for the normal menu
     if (e && e.altKey == true)
-        return false
+        return
 
     if (rightmenu.style.display == 'block')
         rightmenu.style.display = 'none'
@@ -78,7 +110,7 @@ function toggleRightMenu(e) {
     rightmenu.style.left = e.clientX
     rightmenu.style.top = e.clientY
 
-    return true
+    e.preventDefault();
 }
 
 </script>

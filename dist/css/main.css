@@ -1,4 +1,4 @@
-video {
+#video {
     width: 100%;
     height: 100%;
     background-color: black;
@@ -17,28 +17,33 @@ video {
 }
 
 #bar>canvas {
-    height:100%;
+    display: inline-block;
+    height: 20%;
+    width: 100px;
     background-color: rgba(0,255,0,0.5);
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 #bar>button {
+    display: inline-block;
     height: 100%;
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 #bar>span {
-    height: 100%;
-    vertical-align: top;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 #bar>#float {
+    display: inline-block;
     float: right;
 }
 
 #bar>#float>button {
+    display: inline-block;
     height: 100%;
-    vertical-align: top;
+    vertical-align: middle;
 }
 
 #rightmenu {

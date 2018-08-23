@@ -2,7 +2,7 @@
 window.oncontextmenu = (e) => rightmenu.toggle(e)
 
 // video
-video.onclick = () => video.toggle()
+video.onclick = () => video.click()
 
 // bar
 bar.getElementsByTagName('button')[0].onclick = () => video.toggle()

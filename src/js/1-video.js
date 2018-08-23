@@ -24,13 +24,13 @@ video.openFullScreen = function() {
     var html = document.documentElement
     if (html.requestFullscreen) {
         html.requestFullscreen();
-      } else if (html.mozRequestFullScreen) {
+    } else if (html.mozRequestFullScreen) {
         html.mozRequestFullScreen();
-      } else if (html.webkitRequestFullscreen) {
+    } else if (html.webkitRequestFullscreen) {
         html.webkitRequestFullscreen();
-      } else if (html.msRequestFullscreen) { 
+    } else if (html.msRequestFullscreen) { 
         html.msRequestFullscreen();
-      }
+    }
 }
 
 video.closeFullscreen = function() {
@@ -43,4 +43,11 @@ video.closeFullscreen = function() {
     } else if (document.msExitFullscreen) { /* IE/Edge */
       document.msExitFullscreen();
     }
-  }
+}
+
+video.click = function() {
+    if (rightmenu.style.display == 'block')
+        rightmenu.toggle()
+    else
+        video.toggle()
+}

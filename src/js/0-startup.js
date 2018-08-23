@@ -3,6 +3,7 @@ document.getElementById('content').innerHTML =
     + template('bar.html', {})
     + template('rightmenu.html', {})
 
-video = document.getElementsByTagName('video')[0]
+// bind our views to the window
+video = document.getElementById('video')
 bar = document.getElementById('bar')
 rightmenu = document.getElementById('rightmenu')

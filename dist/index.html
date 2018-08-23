@@ -11,7 +11,10 @@
     <button>Play/Pause</button>
     <button>Mute/Unmute</button>
     <canvas></canvas>
-    <span>00:00 / 11:11</span>
+    <span>
+        <span id='currentTime'>00:00</span> / 
+        <span id='duration'>11:11</span>
+    </span>
     <div id='float'>
         <button>Settings</button>
         <button>DTube</button>
@@ -33,7 +36,8 @@ document.getElementById('content').innerHTML =
     + template('bar.html', {})
     + template('rightmenu.html', {})
 
-video = document.getElementsByTagName('video')[0]
+// bind our views to the window
+video = document.getElementById('video')
 bar = document.getElementById('bar')
 rightmenu = document.getElementById('rightmenu')
 
@@ -95,6 +99,8 @@ window.oncontextmenu = (e) => rightmenu.toggle(e)
 
 // video
 video.onclick = () => video.click()
+video.ontimeupdate = () => proxy.currentTime = video.currentTime
+video.ondurationchange = () => proxy.duration = video.duration
 
 // bar
 bar.getElementsByTagName('button')[0].onclick = () => video.toggle()
@@ -119,6 +125,23 @@ rightmenu.toggle = function(e) {
 
     e.preventDefault();
 }
+proxy = new Proxy({
+  currentTime: 0
+},{
+  get: function(obj, prop) {
+    if (prop in obj)
+      return obj[prop]
+    return undefined;
+  },
+  set: function(obj, prop, value) {
+    obj[prop] = value;
+    if (document.getElementById(prop))
+      document.getElementById(prop).innerHTML = value;
+    return true;
+  }
+})
+
+
 
 </script>
 </body>

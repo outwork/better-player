@@ -2,18 +2,31 @@
 <head>
 <link href="css/main.css" rel="stylesheet">
 <script src="js/template-web.js"></script>
+<script src="js/deep-proxy.js"></script>
 </head>
 
 <body style='margin:0'>
 <div id="content"></div>
-<script id="bar.html" type="text/html">
+<script id="button-mute.html" type="text/html"><button id='button-mute'>
+    {{if bar.volume}}
+        Mute
+    {{else}}
+        Unmute
+    {{/if}}
+</button></script><script id="button-play.html" type="text/html"><button id='button-play'>
+    {{if bar.paused}}
+        Play
+    {{else}}
+        Pause
+    {{/if}}
+</button></script><script id="bar.html" type="text/html">
 <div id='bar'>
-    <button>Play/Pause</button>
-    <button>Mute/Unmute</button>
+    {{include 'button-play.html'}}
+    {{include 'button-mute.html'}}
     <canvas></canvas>
     <span>
-        <span id='currentTime'>00:00</span> / 
-        <span id='duration'>11:11</span>
+        <span id='currentTime'>{{currentTime}}</span> / 
+        <span id='duration'>{{bar.duration}}</span>
     </span>
     <div id='float'>
         <button>Settings</button>
@@ -31,16 +44,109 @@
     src="https://video.dtube.top/ipfs/QmSxeVrAZCmeKvvnn1cidFPAAAh3rvjAwrEpQ4ZjPZmUYg">
 </video></script>
 <script>
+proxy = new Proxy({},{
+  get: function(obj, prop) {
+    return get(obj, prop)
+  },
+  set: function(obj, prop, value) {
+    return set(obj, prop, value)
+  }
+})
+
+
+
+function set(obj, prop, value) {
+  console.log(obj._template,prop,value)
+  obj[prop] = value;
+
+  if (!obj._template && document.getElementById(prop)) {
+    document.getElementById(prop).innerHTML = value
+    return true;
+  }
+
+  for (let i = 0; i < templates.length; i++) {
+    if (!obj || !obj._template) break;
+    if (obj._template.startsWith(templates[i])) {
+      if (!window[templates[i]]) return
+      window[templates[i]].outerHTML = template(templates[i]+'.html', proxy)
+      window[templates[i]] = document.getElementById(templates[i])
+      bind[templates[i]]()
+    }
+    
+  }
+  
+  return true;
+}
+
+function get(obj, prop) {
+  if (!(prop in obj))
+    obj[prop] = new Proxy({_template: prop},{
+      get: function(obj, prop) {
+        return get(obj, prop)
+      },
+      set: function(obj, prop, value) {
+        return set(obj, prop, value)
+      }
+    })
+
+  return obj[prop]
+}
+templates = ['video', 'bar', 'rightmenu']
+proxy.bar.paused = true
+proxy.bar.duration = 0
+proxy.bar.volume = 0
+proxy.currentTime = 0
+
 document.getElementById('content').innerHTML = 
-    template('video.html', {})
-    + template('bar.html', {})
-    + template('rightmenu.html', {})
+    template('video.html', proxy)
+    + template('bar.html', proxy)
+    + template('rightmenu.html', proxy)
 
 // bind our views to the window
 video = document.getElementById('video')
 bar = document.getElementById('bar')
 rightmenu = document.getElementById('rightmenu')
 
+window.oncontextmenu = (e) => rightmenu.toggle(e)
+
+bind = {
+    bar: function() {
+        bar.getElementsByTagName('button')[0].onclick = () => video.toggle()
+        bar.getElementsByTagName('button')[1].onclick = () => video.mute()
+        bar.getElementsByTagName('button')[4].onclick = () => video.toggleFullscreen()
+    },
+    video: function() {
+        video.onclick = () => video.click()
+        video.ontimeupdate = () => proxy.currentTime = video.currentTime
+        video.ondurationchange = () => proxy.bar.duration = video.duration
+        video.onpause = () => proxy.bar.paused = video.paused
+        video.onplay = () => proxy.bar.paused = video.paused
+        video.onvolumechange = () => proxy.bar.volume = video.volume
+    },
+    rightclick: function() {
+        
+    }
+}
+
+bind.bar()
+bind.video()
+bind.rightclick()
+rightmenu.toggle = function(e) {
+    //console.log('right click', rightmenu.style.display, e)
+    // pressing alt key disables this menu for the normal menu
+    if (e && e.altKey == true)
+        return
+
+    if (rightmenu.style.display == 'block')
+        rightmenu.style.display = 'none'
+    else
+        rightmenu.style.display = 'block'
+
+    rightmenu.style.left = e.clientX
+    rightmenu.style.top = e.clientY
+
+    e.preventDefault();
+}
 video.toggle = function() {
     if (video.paused)
         video.play()
@@ -94,54 +200,6 @@ video.click = function() {
     else
         video.toggle()
 }
-// window
-window.oncontextmenu = (e) => rightmenu.toggle(e)
-
-// video
-video.onclick = () => video.click()
-video.ontimeupdate = () => proxy.currentTime = video.currentTime
-video.ondurationchange = () => proxy.duration = video.duration
-
-// bar
-bar.getElementsByTagName('button')[0].onclick = () => video.toggle()
-bar.getElementsByTagName('button')[1].onclick = () => video.mute()
-bar.getElementsByTagName('button')[4].onclick = () => video.toggleFullscreen()
-
-// rightmenu
-
-rightmenu.toggle = function(e) {
-    //console.log('right click', rightmenu.style.display, e)
-    // pressing alt key disables this menu for the normal menu
-    if (e && e.altKey == true)
-        return
-
-    if (rightmenu.style.display == 'block')
-        rightmenu.style.display = 'none'
-    else
-        rightmenu.style.display = 'block'
-
-    rightmenu.style.left = e.clientX
-    rightmenu.style.top = e.clientY
-
-    e.preventDefault();
-}
-proxy = new Proxy({
-  currentTime: 0
-},{
-  get: function(obj, prop) {
-    if (prop in obj)
-      return obj[prop]
-    return undefined;
-  },
-  set: function(obj, prop, value) {
-    obj[prop] = value;
-    if (document.getElementById(prop))
-      document.getElementById(prop).innerHTML = value;
-    return true;
-  }
-})
-
-
 
 </script>
 </body>

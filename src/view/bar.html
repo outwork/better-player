@@ -1,11 +1,11 @@
 
 <div id='bar'>
-    <button>Play/Pause</button>
-    <button>Mute/Unmute</button>
+    {{include 'button-play.html'}}
+    {{include 'button-mute.html'}}
     <canvas></canvas>
     <span>
-        <span id='currentTime'>00:00</span> / 
-        <span id='duration'>11:11</span>
+        <span id='currentTime'>{{currentTime}}</span> / 
+        <span id='duration'>{{bar.duration}}</span>
     </span>
     <div id='float'>
         <button>Settings</button>

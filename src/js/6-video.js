@@ -68,3 +68,16 @@ video.click = function() {
     if (mustToggle)
         video.toggle()
 }
+
+video.progress = function() {
+    // happens when the buffer zone changes
+    var duration =  video.duration;
+    if (duration > 0) {
+      for (var i = 0; i < video.buffered.length; i++) {
+            if (video.buffered.start(video.buffered.length - 1 - i) < video.currentTime) {
+                document.getElementById("timebar-buffered").style.width = (video.buffered.end(video.buffered.length - 1 - i) / duration) * 100 + "%";
+                break;
+            }
+        }
+    }
+}

@@ -42,6 +42,7 @@ bind = {
         video.onplay = () => proxy.bar.paused = video.paused
         proxy.bar.volume = video.volume
         video.onvolumechange = () => proxy.bar.volume = video.volume
+        video.onprogress = () => video.progress()
     },
     rightmenu: function() {
     },

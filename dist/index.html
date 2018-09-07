@@ -2,7 +2,6 @@
 <head>
 <link href="css/main.css" rel="stylesheet">
 <script src="js/template-web.js"></script>
-<script src="js/deep-proxy.js"></script>
 </head>
 
 <body style='margin:0'>
@@ -19,22 +18,47 @@
     {{else}}
         Pause
     {{/if}}
-</button></script><script id="bar.html" type="text/html">
+</button></script><script id="button-settings.html" type="text/html"><button id='button-settings'>
+    Settings
+</button></script><script id="canvas-volume.html" type="text/html"><span id='span-volume'>
+    <div id='volume-filler' style="width:{{bar.volume*100}}%"></div>
+</span></script><script id="bar.html" type="text/html">
 <div id='bar'>
     {{include 'button-play.html'}}
     {{include 'button-mute.html'}}
-    <canvas></canvas>
+    {{include 'canvas-volume.html'}}
     <span>
-        <span id='currentTime'>{{currentTime}}</span> / 
-        <span id='duration'>{{bar.duration}}</span>
+        <span id='currentTime'>{{currentTime | timeFormat}}</span> / 
+        <span id='duration'>{{bar.duration | timeFormat}}</span>
     </span>
     <div id='float'>
-        <button>Settings</button>
+        {{include 'button-settings.html'}}
         <button>DTube</button>
         <button>Full Screen</button>
     </div>
 </div></script><script id="rightmenu.html" type="text/html"><div id='rightmenu'>
-    
+    <div>
+        <div>Copy video URL</div>
+    </div>
+    <div>
+        <div>Copy video URL at current time</div>
+    </div>
+    <div>
+        <div>Copy embed code</div>
+    </div>
+    <div>
+        <div>Loop</div>
+    </div>
+    <div>
+        <div>Stats</div>
+    </div>
+</div></script><script id="settingsmenu.html" type="text/html"><div id='settingsmenu'>
+    <div>
+        <div>Speed</div>
+    </div>
+    <div>
+        <div>Quality</div>
+    </div>
 </div></script><script id="video.html" type="text/html">
 <video
     id="video"
@@ -53,14 +77,16 @@ proxy = new Proxy({},{
   }
 })
 
-
-
 function set(obj, prop, value) {
-  console.log(obj._template,prop,value)
+  // if (prop != 'currentTime')
+  //   console.log(obj._template,prop,value)
   obj[prop] = value;
 
   if (!obj._template && document.getElementById(prop)) {
-    document.getElementById(prop).innerHTML = value
+    if (prop == 'currentTime')
+    document.getElementById(prop).innerHTML = template.defaults.imports.timeFormat(value)
+    else
+      document.getElementById(prop).innerHTML = value
     return true;
   }
 
@@ -69,7 +95,6 @@ function set(obj, prop, value) {
     if (obj._template.startsWith(templates[i])) {
       if (!window[templates[i]]) return
       window[templates[i]].outerHTML = template(templates[i]+'.html', proxy)
-      window[templates[i]] = document.getElementById(templates[i])
       bind[templates[i]]()
     }
     
@@ -91,6 +116,24 @@ function get(obj, prop) {
 
   return obj[prop]
 }
+template.defaults.imports.timeFormat = function(secs){
+    secs = Math.round(secs)
+    var output = ''
+    var mins = Math.floor(secs/60)
+    secs = secs%60
+    var hours = Math.floor(mins/60)
+    mins = mins%60
+    output = (secs < 10 ? '0'+secs : secs)+output
+    output = ':'+output
+    output = (mins < 10 ? '0'+mins : mins)+output
+    
+    if (hours>0) {
+        output = ':'+output
+        output = (hours < 10 ? '0'+hours : hours)+output
+    }
+        
+    return output
+};
 templates = ['video', 'bar', 'rightmenu']
 proxy.bar.paused = true
 proxy.bar.duration = 0
@@ -101,51 +144,93 @@ document.getElementById('content').innerHTML =
     template('video.html', proxy)
     + template('bar.html', proxy)
     + template('rightmenu.html', proxy)
-
-// bind our views to the window
-video = document.getElementById('video')
-bar = document.getElementById('bar')
-rightmenu = document.getElementById('rightmenu')
+    + template('settingsmenu.html', proxy)
 
 window.oncontextmenu = (e) => rightmenu.toggle(e)
 
 bind = {
     bar: function() {
+        bar = document.getElementById('bar')
         bar.getElementsByTagName('button')[0].onclick = () => video.toggle()
         bar.getElementsByTagName('button')[1].onclick = () => video.mute()
+        bar.getElementsByTagName('button')[2].onclick = () => settingsmenu.toggle()
         bar.getElementsByTagName('button')[4].onclick = () => video.toggleFullscreen()
+        
+        // volume changer
+        bar.spanVolume = document.getElementById('span-volume')
+        bar.spanVolume.addEventListener('mousemove', function(e){
+            if (typeof isVolumeBeingChanged == 'undefined' || !isVolumeBeingChanged) return
+            video.volume = Math.round(100*e.offsetX/bar.spanVolume.offsetWidth)/100
+        }, false)
+        bar.spanVolume.handleMouseDown = function(e) {
+            isVolumeBeingChanged = true
+            console.log('mousedown')
+            video.volume = Math.round(100*e.offsetX/bar.spanVolume.offsetWidth)/100
+        }
+        bar.spanVolume.addEventListener('mousedown', bar.spanVolume.handleMouseDown, false)
+        bar.spanVolume.addEventListener('mouseup', function(e){
+            isVolumeBeingChanged = false
+            console.log('mouseup')
+            video.volume = Math.round(100*e.offsetX/bar.spanVolume.offsetWidth)/100
+            bar.spanVolume.removeEventListener('mousemove', bar.spanVolume.handleMouseDown, false)
+        }, false)
+        bar.spanVolume.addEventListener('mouseleave', function(e){
+            if (typeof isVolumeBeingChanged == 'undefined' || !isVolumeBeingChanged) return            
+            isVolumeBeingChanged = false
+            console.log('mouseleave')
+            video.volume = Math.round(100*e.offsetX/bar.spanVolume.offsetWidth)/100
+            bar.spanVolume.removeEventListener('mousemove', bar.spanVolume.handleMouseDown, false)
+        }, false)
+        
     },
     video: function() {
+        video = document.getElementById('video')
         video.onclick = () => video.click()
         video.ontimeupdate = () => proxy.currentTime = video.currentTime
         video.ondurationchange = () => proxy.bar.duration = video.duration
         video.onpause = () => proxy.bar.paused = video.paused
         video.onplay = () => proxy.bar.paused = video.paused
+        proxy.bar.volume = video.volume
         video.onvolumechange = () => proxy.bar.volume = video.volume
     },
-    rightclick: function() {
-        
+    rightmenu: function() {
+        rightmenu = document.getElementById('rightmenu')
+    },
+    settingsmenu: function() {
+        settingsmenu = document.getElementById('settingsmenu')
     }
 }
 
 bind.bar()
 bind.video()
-bind.rightclick()
+bind.rightmenu()
+bind.settingsmenu()
+
 rightmenu.toggle = function(e) {
     //console.log('right click', rightmenu.style.display, e)
     // pressing alt key disables this menu for the normal menu
     if (e && e.altKey == true)
         return
 
-    if (rightmenu.style.display == 'block')
+    if (rightmenu.style.display == 'table')
         rightmenu.style.display = 'none'
-    else
-        rightmenu.style.display = 'block'
+    else {
+        rightmenu.style.display = 'table'
+        var width = 358;
+        var height = 244;
+        if (e.clientX+width <= window.innerWidth)
+            rightmenu.style.left = e.clientX
+        else
+            rightmenu.style.left = e.clientX-width
 
-    rightmenu.style.left = e.clientX
-    rightmenu.style.top = e.clientY
+        if (e.clientY+height <= window.innerHeight)
+            rightmenu.style.top = e.clientY
+        else
+            rightmenu.style.top = e.clientY-height
 
-    e.preventDefault();
+    }
+    if (e)
+        e.preventDefault();
 }
 video.toggle = function() {
     if (video.paused)
@@ -195,10 +280,33 @@ video.closeFullscreen = function() {
 }
 
 video.click = function() {
-    if (rightmenu.style.display == 'block')
+    var newClick = new Date()
+    var mustToggle = true
+
+    if (typeof lastClickDate == 'object' && newClick-lastClickDate<200) {
+        video.toggleFullscreen()
+        mustToggle = false
+    }
+
+    lastClickDate = newClick
+    if (rightmenu.style.display == 'table') {
         rightmenu.toggle()
-    else
+        mustToggle = false
+    }
+        
+    if (settingsmenu.style.display == 'table') {
+        settingsmenu.toggle()
+        mustToggle = false
+    }
+        
+    if (mustToggle)
         video.toggle()
+}
+settingsmenu.toggle = function() {
+    if (settingsmenu.style.display == 'table')
+        settingsmenu.style.display = 'none'
+    else
+        settingsmenu.style.display = 'table'
 }
 
 </script>

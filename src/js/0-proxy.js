@@ -7,14 +7,16 @@ proxy = new Proxy({},{
   }
 })
 
-
-
 function set(obj, prop, value) {
-  console.log(obj._template,prop,value)
+  // if (prop != 'currentTime')
+  //   console.log(obj._template,prop,value)
   obj[prop] = value;
 
   if (!obj._template && document.getElementById(prop)) {
-    document.getElementById(prop).innerHTML = value
+    if (prop == 'currentTime')
+    document.getElementById(prop).innerHTML = template.defaults.imports.timeFormat(value)
+    else
+      document.getElementById(prop).innerHTML = value
     return true;
   }
 
@@ -23,7 +25,6 @@ function set(obj, prop, value) {
     if (obj._template.startsWith(templates[i])) {
       if (!window[templates[i]]) return
       window[templates[i]].outerHTML = template(templates[i]+'.html', proxy)
-      window[templates[i]] = document.getElementById(templates[i])
       bind[templates[i]]()
     }
     

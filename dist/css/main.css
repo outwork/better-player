@@ -16,12 +16,17 @@
     text-shadow: 0 0 2px rgba(0,0,0,.5);
 }
 
-#bar>canvas {
+#bar>#span-volume {
     display: inline-block;
-    height: 20%;
+    height: 80%;
     width: 100px;
-    background-color: rgba(0,255,0,0.5);
+    /* background-color: rgba(0,255,0,0.5); */
     vertical-align: middle;
+}
+
+#bar>#span-volume>#volume-filler {
+    height:100%;
+    background-color: rgba(0,255,0,0.5);
 }
 
 #bar>button {
@@ -57,6 +62,17 @@
     display: none;
 }
 
+#rightmenu>div {
+    display: table-row;
+}
+
+#rightmenu>div>div {
+    display: table-cell;
+    vertical-align: middle;
+    color: white;
+    font-weight: 700;
+}
+
 /* Chrome, Safari and Opera syntax */
 :-webkit-full-screen {
     background-color: yellow;
@@ -75,4 +91,26 @@
 /* Standard syntax */
 :fullscreen {
     background-color: yellow;
+}
+
+#settingsmenu {
+    z-index: 63;
+    background-color: rgba(255,128,128,0.5);
+    position: absolute;
+    width: 358px;
+    height: 244px;
+    right: 10px;
+    bottom: 40px;
+    display: none;
+}
+
+#settingsmenu>div {
+    display: table-row;
+}
+
+#settingsmenu>div>div {
+    display: table-cell;
+    vertical-align: middle;
+    color: white;
+    font-weight: 700;
 }

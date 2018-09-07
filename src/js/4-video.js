@@ -46,8 +46,25 @@ video.closeFullscreen = function() {
 }
 
 video.click = function() {
-    if (rightmenu.style.display == 'block')
+    var newClick = new Date()
+    var mustToggle = true
+
+    if (typeof lastClickDate == 'object' && newClick-lastClickDate<200) {
+        video.toggleFullscreen()
+        mustToggle = false
+    }
+
+    lastClickDate = newClick
+    if (rightmenu.style.display == 'table') {
         rightmenu.toggle()
-    else
+        mustToggle = false
+    }
+        
+    if (settingsmenu.style.display == 'table') {
+        settingsmenu.toggle()
+        mustToggle = false
+    }
+        
+    if (mustToggle)
         video.toggle()
 }

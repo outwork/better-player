@@ -2,13 +2,13 @@
 <div id='bar'>
     {{include 'button-play.html'}}
     {{include 'button-mute.html'}}
-    <canvas></canvas>
+    {{include 'canvas-volume.html'}}
     <span>
-        <span id='currentTime'>{{currentTime}}</span> / 
-        <span id='duration'>{{bar.duration}}</span>
+        <span id='currentTime'>{{currentTime | timeFormat}}</span> / 
+        <span id='duration'>{{bar.duration | timeFormat}}</span>
     </span>
     <div id='float'>
-        <button>Settings</button>
+        {{include 'button-settings.html'}}
         <button>DTube</button>
         <button>Full Screen</button>
     </div>

@@ -4,13 +4,23 @@ rightmenu.toggle = function(e) {
     if (e && e.altKey == true)
         return
 
-    if (rightmenu.style.display == 'block')
+    if (rightmenu.style.display == 'table')
         rightmenu.style.display = 'none'
-    else
-        rightmenu.style.display = 'block'
+    else {
+        rightmenu.style.display = 'table'
+        var width = 358;
+        var height = 244;
+        if (e.clientX+width <= window.innerWidth)
+            rightmenu.style.left = e.clientX
+        else
+            rightmenu.style.left = e.clientX-width
 
-    rightmenu.style.left = e.clientX
-    rightmenu.style.top = e.clientY
+        if (e.clientY+height <= window.innerHeight)
+            rightmenu.style.top = e.clientY
+        else
+            rightmenu.style.top = e.clientY-height
 
-    e.preventDefault();
+    }
+    if (e)
+        e.preventDefault();
 }

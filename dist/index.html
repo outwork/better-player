@@ -20,13 +20,13 @@
     {{/if}}
 </button></script><script id="button-settings.html" type="text/html"><button id='button-settings'>
     Settings
-</button></script><script id="canvas-volume.html" type="text/html"><span id='span-volume'>
+</button></script><script id="span-volume.html" type="text/html"><span id='span-volume'>
     <div id='volume-filler' style="width:{{bar.volume*100}}%"></div>
 </span></script><script id="bar.html" type="text/html">
 <div id='bar'>
     {{include 'button-play.html'}}
     {{include 'button-mute.html'}}
-    {{include 'canvas-volume.html'}}
+    {{include 'span-volume.html'}}
     <span>
         <span id='currentTime'>{{currentTime | timeFormat}}</span> / 
         <span id='duration'>{{bar.duration | timeFormat}}</span>
@@ -59,6 +59,8 @@
     <div>
         <div>Quality</div>
     </div>
+</div></script><script id="timebar.html" type="text/html"><div id='timebar'>
+    <div id='timebar-filler'></div>
 </div></script><script id="video.html" type="text/html">
 <video
     id="video"
@@ -82,9 +84,12 @@ function set(obj, prop, value) {
   //   console.log(obj._template,prop,value)
   obj[prop] = value;
 
+  // for single values where we dont want to update the full template (i.e current time)
   if (!obj._template && document.getElementById(prop)) {
-    if (prop == 'currentTime')
-    document.getElementById(prop).innerHTML = template.defaults.imports.timeFormat(value)
+    if (prop == 'currentTime') {
+      document.getElementById('timebar-filler').style.width = template.defaults.imports.timebarPercent(proxy.currentTime/proxy.bar.duration) + '%'
+      document.getElementById(prop).innerHTML = template.defaults.imports.timeFormat(value)
+    }
     else
       document.getElementById(prop).innerHTML = value
     return true;
@@ -97,7 +102,6 @@ function set(obj, prop, value) {
       window[templates[i]].outerHTML = template(templates[i]+'.html', proxy)
       bind[templates[i]]()
     }
-    
   }
   
   return true;
@@ -134,7 +138,11 @@ template.defaults.imports.timeFormat = function(secs){
         
     return output
 };
-templates = ['video', 'bar', 'rightmenu']
+
+template.defaults.imports.timebarPercent = function(float) {
+    return Math.round(10000*float)/100
+}
+templates = ['video', 'bar', 'rightmenu', 'settingsmenu', 'timebar']
 proxy.bar.paused = true
 proxy.bar.duration = 0
 proxy.bar.volume = 0
@@ -145,12 +153,12 @@ document.getElementById('content').innerHTML =
     + template('bar.html', proxy)
     + template('rightmenu.html', proxy)
     + template('settingsmenu.html', proxy)
+    + template('timebar.html', proxy)
 
 window.oncontextmenu = (e) => rightmenu.toggle(e)
 
 bind = {
     bar: function() {
-        bar = document.getElementById('bar')
         bar.getElementsByTagName('button')[0].onclick = () => video.toggle()
         bar.getElementsByTagName('button')[1].onclick = () => video.mute()
         bar.getElementsByTagName('button')[2].onclick = () => settingsmenu.toggle()
@@ -184,7 +192,6 @@ bind = {
         
     },
     video: function() {
-        video = document.getElementById('video')
         video.onclick = () => video.click()
         video.ontimeupdate = () => proxy.currentTime = video.currentTime
         video.ondurationchange = () => proxy.bar.duration = video.duration
@@ -194,10 +201,34 @@ bind = {
         video.onvolumechange = () => proxy.bar.volume = video.volume
     },
     rightmenu: function() {
-        rightmenu = document.getElementById('rightmenu')
     },
     settingsmenu: function() {
-        settingsmenu = document.getElementById('settingsmenu')
+    },
+    timebar: function() {
+        // time changer
+        timebar.addEventListener('mousemove', function(e){
+            if (typeof isTimeBeingChanged == 'undefined' || !isTimeBeingChanged) return
+            video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
+        }, false)
+        timebar.handleMouseDown = function(e) {
+            isTimeBeingChanged = true
+            console.log('mousedown')
+            video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
+        }
+        timebar.addEventListener('mousedown', timebar.handleMouseDown, false)
+        timebar.addEventListener('mouseup', function(e){
+            isTimeBeingChanged = false
+            console.log('mouseup')
+            video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
+            timebar.removeEventListener('mousemove', timebar.handleMouseDown, false)
+        }, false)
+        timebar.addEventListener('mouseleave', function(e){
+            if (typeof isTimeBeingChanged == 'undefined' || !isTimeBeingChanged) return            
+            isTimeBeingChanged = false
+            console.log('mouseleave')
+            video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
+            timebar.removeEventListener('mousemove', timebar.handleMouseDown, false)
+        }, false)
     }
 }
 
@@ -205,6 +236,7 @@ bind.bar()
 bind.video()
 bind.rightmenu()
 bind.settingsmenu()
+bind.timebar()
 
 rightmenu.toggle = function(e) {
     //console.log('right click', rightmenu.style.display, e)
@@ -231,6 +263,12 @@ rightmenu.toggle = function(e) {
     }
     if (e)
         e.preventDefault();
+}
+settingsmenu.toggle = function() {
+    if (settingsmenu.style.display == 'table')
+        settingsmenu.style.display = 'none'
+    else
+        settingsmenu.style.display = 'table'
 }
 video.toggle = function() {
     if (video.paused)
@@ -302,12 +340,7 @@ video.click = function() {
     if (mustToggle)
         video.toggle()
 }
-settingsmenu.toggle = function() {
-    if (settingsmenu.style.display == 'table')
-        settingsmenu.style.display = 'none'
-    else
-        settingsmenu.style.display = 'table'
-}
+
 
 </script>
 </body>

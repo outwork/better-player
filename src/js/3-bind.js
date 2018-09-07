@@ -2,7 +2,6 @@ window.oncontextmenu = (e) => rightmenu.toggle(e)
 
 bind = {
     bar: function() {
-        bar = document.getElementById('bar')
         bar.getElementsByTagName('button')[0].onclick = () => video.toggle()
         bar.getElementsByTagName('button')[1].onclick = () => video.mute()
         bar.getElementsByTagName('button')[2].onclick = () => settingsmenu.toggle()
@@ -36,7 +35,6 @@ bind = {
         
     },
     video: function() {
-        video = document.getElementById('video')
         video.onclick = () => video.click()
         video.ontimeupdate = () => proxy.currentTime = video.currentTime
         video.ondurationchange = () => proxy.bar.duration = video.duration
@@ -46,10 +44,34 @@ bind = {
         video.onvolumechange = () => proxy.bar.volume = video.volume
     },
     rightmenu: function() {
-        rightmenu = document.getElementById('rightmenu')
     },
     settingsmenu: function() {
-        settingsmenu = document.getElementById('settingsmenu')
+    },
+    timebar: function() {
+        // time changer
+        timebar.addEventListener('mousemove', function(e){
+            if (typeof isTimeBeingChanged == 'undefined' || !isTimeBeingChanged) return
+            video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
+        }, false)
+        timebar.handleMouseDown = function(e) {
+            isTimeBeingChanged = true
+            console.log('mousedown')
+            video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
+        }
+        timebar.addEventListener('mousedown', timebar.handleMouseDown, false)
+        timebar.addEventListener('mouseup', function(e){
+            isTimeBeingChanged = false
+            console.log('mouseup')
+            video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
+            timebar.removeEventListener('mousemove', timebar.handleMouseDown, false)
+        }, false)
+        timebar.addEventListener('mouseleave', function(e){
+            if (typeof isTimeBeingChanged == 'undefined' || !isTimeBeingChanged) return            
+            isTimeBeingChanged = false
+            console.log('mouseleave')
+            video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
+            timebar.removeEventListener('mousemove', timebar.handleMouseDown, false)
+        }, false)
     }
 }
 
@@ -57,3 +79,4 @@ bind.bar()
 bind.video()
 bind.rightmenu()
 bind.settingsmenu()
+bind.timebar()

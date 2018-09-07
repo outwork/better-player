@@ -114,3 +114,21 @@
     color: white;
     font-weight: 700;
 }
+
+#timebar {
+    background-color: white;
+    bottom: 50px;
+    height: 36px;
+    width: 100%;
+    z-index: 60;
+    text-align: left;
+    direction: ltr;
+    position: absolute;
+    text-shadow: 0 0 2px rgba(0,0,0,.5);
+}
+
+#timebar>#timebar-filler {
+    height:100%;
+    background-color: rgba(162, 0, 255, 0.5);
+    width: 0%;
+}

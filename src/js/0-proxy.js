@@ -12,9 +12,12 @@ function set(obj, prop, value) {
   //   console.log(obj._template,prop,value)
   obj[prop] = value;
 
+  // for single values where we dont want to update the full template (i.e current time)
   if (!obj._template && document.getElementById(prop)) {
-    if (prop == 'currentTime')
-    document.getElementById(prop).innerHTML = template.defaults.imports.timeFormat(value)
+    if (prop == 'currentTime') {
+      document.getElementById('timebar-filler').style.width = template.defaults.imports.timebarPercent(proxy.currentTime/proxy.bar.duration) + '%'
+      document.getElementById(prop).innerHTML = template.defaults.imports.timeFormat(value)
+    }
     else
       document.getElementById(prop).innerHTML = value
     return true;
@@ -27,7 +30,6 @@ function set(obj, prop, value) {
       window[templates[i]].outerHTML = template(templates[i]+'.html', proxy)
       bind[templates[i]]()
     }
-    
   }
   
   return true;

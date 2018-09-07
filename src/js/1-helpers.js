@@ -16,3 +16,7 @@ template.defaults.imports.timeFormat = function(secs){
         
     return output
 };
+
+template.defaults.imports.timebarPercent = function(float) {
+    return Math.round(10000*float)/100
+}

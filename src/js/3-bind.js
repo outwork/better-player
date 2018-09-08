@@ -1,6 +1,6 @@
 window.oncontextmenu = (e) => rightmenu.toggle(e)
 
-bind = {
+var bind = {
     bar: function() {
         bar.getElementsByTagName('button')[0].onclick = () => video.toggle()
         bar.getElementsByTagName('button')[1].onclick = () => video.mute()
@@ -10,24 +10,24 @@ bind = {
         // volume changer
         bar.spanVolume = document.getElementById('span-volume')
         bar.spanVolume.addEventListener('mousemove', function(e){
-            if (typeof isVolumeBeingChanged == 'undefined' || !isVolumeBeingChanged) return
+            if (typeof proxy.isVolumeBeingChanged == 'undefined' || !proxy.isVolumeBeingChanged) return
             video.volume = Math.round(100*e.offsetX/bar.spanVolume.offsetWidth)/100
         }, false)
         bar.spanVolume.handleMouseDown = function(e) {
-            isVolumeBeingChanged = true
+            proxy.isVolumeBeingChanged = true
             console.log('mousedown')
             video.volume = Math.round(100*e.offsetX/bar.spanVolume.offsetWidth)/100
         }
         bar.spanVolume.addEventListener('mousedown', bar.spanVolume.handleMouseDown, false)
         bar.spanVolume.addEventListener('mouseup', function(e){
-            isVolumeBeingChanged = false
+            proxy.isVolumeBeingChanged = false
             console.log('mouseup')
             video.volume = Math.round(100*e.offsetX/bar.spanVolume.offsetWidth)/100
             bar.spanVolume.removeEventListener('mousemove', bar.spanVolume.handleMouseDown, false)
         }, false)
         bar.spanVolume.addEventListener('mouseleave', function(e){
-            if (typeof isVolumeBeingChanged == 'undefined' || !isVolumeBeingChanged) return            
-            isVolumeBeingChanged = false
+            if (typeof proxy.isVolumeBeingChanged == 'undefined' || !proxy.isVolumeBeingChanged) return            
+            proxy.isVolumeBeingChanged = false
             console.log('mouseleave')
             video.volume = Math.round(100*e.offsetX/bar.spanVolume.offsetWidth)/100
             bar.spanVolume.removeEventListener('mousemove', bar.spanVolume.handleMouseDown, false)
@@ -51,24 +51,24 @@ bind = {
     timebar: function() {
         // time changer
         timebar.addEventListener('mousemove', function(e){
-            if (typeof isTimeBeingChanged == 'undefined' || !isTimeBeingChanged) return
+            if (typeof proxy.isTimeBeingChanged == 'undefined' || !proxy.isTimeBeingChanged) return
             video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
         }, false)
         timebar.handleMouseDown = function(e) {
-            isTimeBeingChanged = true
+            proxy.isTimeBeingChanged = true
             console.log('mousedown')
             video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
         }
         timebar.addEventListener('mousedown', timebar.handleMouseDown, false)
         timebar.addEventListener('mouseup', function(e){
-            isTimeBeingChanged = false
+            proxy.isTimeBeingChanged = false
             console.log('mouseup')
             video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
             timebar.removeEventListener('mousemove', timebar.handleMouseDown, false)
         }, false)
         timebar.addEventListener('mouseleave', function(e){
-            if (typeof isTimeBeingChanged == 'undefined' || !isTimeBeingChanged) return            
-            isTimeBeingChanged = false
+            if (typeof proxy.isTimeBeingChanged == 'undefined' || !proxy.isTimeBeingChanged) return            
+            proxy.isTimeBeingChanged = false
             console.log('mouseleave')
             video.currentTime = Math.round(100*video.duration*e.offsetX/timebar.offsetWidth)/100
             timebar.removeEventListener('mousemove', timebar.handleMouseDown, false)

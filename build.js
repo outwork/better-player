@@ -12,6 +12,7 @@ var code = fs.readFileSync('./src/index.html', 'utf8');
 var views = ''
 addViews(viewFolder)
 code = code.replace('@@VIEWS@@', views)
+fs.writeFileSync('./dist/index.html', code);
 console.log('Packaged views...')
 
 // add the javascript
@@ -21,8 +22,7 @@ fs.readdirSync(jsFolder).forEach(file => {
   var contents = fs.readFileSync(jsFolder+file, 'utf8');
   scripts += contents+'\n'
 })
-code = code.replace('@@SCRIPTS@@', scripts)
-fs.writeFileSync('./dist/index.html', code);
+fs.writeFileSync('./dist/js/raw.js', scripts);
 console.log('Packaged javascripts...')
 
 console.log('Succesfully built!')

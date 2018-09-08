@@ -1,4 +1,4 @@
-proxy = new Proxy({},{
+var proxy = new Proxy({},{
   get: function(obj, prop) {
     return get(obj, prop)
   },
@@ -22,16 +22,14 @@ function set(obj, prop, value) {
       document.getElementById(prop).innerHTML = value
     return true;
   }
-
   for (let i = 0; i < templates.length; i++) {
     if (!obj || !obj._template) break;
     if (obj._template.startsWith(templates[i])) {
-      if (!window[templates[i]]) return
+      if (!window[templates[i]]) return true;
       window[templates[i]].outerHTML = template(templates[i]+'.html', proxy)
       bind[templates[i]]()
     }
   }
-  
   return true;
 }
 

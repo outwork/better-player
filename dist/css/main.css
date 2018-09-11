@@ -1,3 +1,9 @@
+body {
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+}
+
 #video {
     width: 100%;
     height: 100%;
@@ -5,33 +11,38 @@
 }
 
 #bar {
-    background-color: rgba(255,0,0,0.5);
+    background: -moz-linear-gradient(top, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 1%, rgba(0,0,0,0.9) 99%, rgba(0,0,0,0.9) 100%);
+    background: -webkit-linear-gradient(top, rgba(0,0,0,0) 0%,rgba(0,0,0,0) 1%,rgba(0,0,0,0.9) 99%,rgba(0,0,0,0.9) 100%);
+    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%,rgba(0,0,0,0) 1%,rgba(0,0,0,0.9) 99%,rgba(0,0,0,0.9) 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00000000', endColorstr='#e6000000',GradientType=0 );
     bottom: 0;
-    height: 36px;
+    height: 30px;
     width: 100%;
     z-index: 60;
     text-align: left;
     direction: ltr;
     position: absolute;
     text-shadow: 0 0 2px rgba(0,0,0,.5);
+    color: white;
+    padding-bottom: 13px;
+    padding-top: 13px;
 }
 
 #bar>#span-volume {
     display: inline-block;
-    height: 80%;
-    width: 100px;
-    /* background-color: rgba(0,255,0,0.5); */
+    height: 12%;
+    width: 90px;
+    background-color: rgba(255, 255, 255, 0.4);
     vertical-align: middle;
 }
 
 #bar>#span-volume>#volume-filler {
     height:100%;
-    background-color: rgba(0,255,0,0.5);
+    background-color:rgba(255, 255, 255, 1);
 }
 
 #bar>button {
     display: inline-block;
-    height: 100%;
     vertical-align: middle;
 }
 
@@ -47,30 +58,32 @@
 
 #bar>#float>button {
     display: inline-block;
-    height: 100%;
     vertical-align: middle;
+}
+
+#duration, #currentTime {
+    font-weight: 500;
 }
 
 #rightmenu {
     z-index: 63;
-    background-color: rgba(0,0,255,0.5);
+    background-color: rgba(0, 0, 0, 0.9);
     position: absolute;
-    width: 358px;
-    height: 244px;
+    width: 294px;
     left: 367px;
     top: 281px;
     display: none;
+    border-radius: 3px;
+    padding: 15px;
 }
 
-#rightmenu>div {
-    display: table-row;
-}
 
 #rightmenu>div>div {
     display: table-cell;
     vertical-align: middle;
-    color: white;
-    font-weight: 700;
+    color: rgba(184, 184, 184, 1);
+    font-weight: 300;
+    padding: 15px;
 }
 
 /* Chrome, Safari and Opera syntax */
@@ -95,51 +108,108 @@
 
 #settingsmenu {
     z-index: 63;
-    background-color: rgba(255,128,128,0.5);
+    background-color: rgba(0, 0, 0, 0.9);
+    border-radius: 3px;
     position: absolute;
-    width: 358px;
-    height: 244px;
+    width: 200px;
     right: 10px;
-    bottom: 40px;
+    bottom: 70px;
     display: none;
-}
-
-#settingsmenu>div {
-    display: table-row;
+    padding: 15px;
+    color: rgba(184, 184, 184, 1)
 }
 
 #settingsmenu>div>div {
     display: table-cell;
     vertical-align: middle;
     color: white;
-    font-weight: 700;
+    font-weight: 300;
+    padding: 15px;
 }
 
 #timebar {
-    background-color: white;
-    bottom: 50px;
-    height: 36px;
+    background-color: rgba(126, 126, 126, 1);
+    height: 7px;
     width: 100%;
     z-index: 60;
     text-align: left;
     direction: ltr;
     position: absolute;
-    text-shadow: 0 0 2px rgba(0,0,0,.5);
 }
 
 #timebar>#timebar-filler {
     position: relative;
     height:100%;
-    background-color: red;
+    background-color: rgba(250, 3, 11, 1);
     width: 0%;
     z-index: 1;
 }
 
 #timebar>#timebar-buffered {
     position: absolute;
-    height: 36px;
-    margin-top: -36px;
-    background-color: rgba(0, 255, 213, 0.5);
+    height: 7px;
+    margin-top: -7px;
+    background-color: rgba(179, 179, 179, 1);
     width: 0%;
     z-index:0;
+}
+
+button {
+    background-color: transparent;
+    padding: 0;
+    border: none;
+    background: none;
+}
+
+#button-settings {
+    background-image: url('sprites.png');
+    background-repeat: no-repeat;
+    background-position: -35px 0px;
+    width: 24px;
+    height: 24px;
+}
+
+#button-settings:hover {
+    background-position: -35px -27px;
+}
+
+#button-fullscreen {
+    background-image: url('sprites.png');
+    background-repeat: no-repeat;
+    background-position: -61px 1px;
+    height: 24px;
+    width: 22px;
+}
+
+#button-fullscreen:hover {
+    background-position: -61px -26px;
+}
+
+#button-dtube {
+    background-image: url('sprites.png');
+    background-repeat: no-repeat;
+    background-position: -157px -4px;
+    height: 17px;
+    width: 61px;
+}
+
+#button-play {
+    background-image: url('sprites.png');
+    background-repeat: no-repeat;
+    background-position: 0px 0px;
+    height: 22px;
+    width: 16px;
+    border-right: 15px;
+}
+
+#button-play:hover {
+    background-position: 0px -27px;
+}
+
+#button-mute {
+    background-image: url('sprites.png');
+    background-repeat: no-repeat;
+    background-position: -108px 1px;
+    height: 22px;
+    width: 24px;
 }
